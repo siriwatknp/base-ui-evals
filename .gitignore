@@ -1,7 +1,10 @@
 node_modules/
 dist/
+evals/**/package-lock.json
 .env
 .env.local
 results/
 *.log
 .DS_Store
+
+evals/*-with-skill

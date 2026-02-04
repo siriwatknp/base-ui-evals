@@ -1,5 +1,5 @@
 {
-  "name": "dialog-form-fields",
+  "name": "button-render",
   "type": "module",
   "scripts": {
     "build": "tsc"

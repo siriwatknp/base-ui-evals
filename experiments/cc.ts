@@ -1,10 +1,10 @@
-import type { ExperimentConfig } from 'agent-eval';
+import type { ExperimentConfig } from "@vercel/agent-eval";
 
 const config: ExperimentConfig = {
-  agent: 'vercel-ai-gateway/claude-code',
-  runs: 1,
+  agent: "vercel-ai-gateway/claude-code",
+  runs: 3,
   earlyExit: true,
-  scripts: ['build'],
+  scripts: ["build"],
   timeout: 600,
 };
 

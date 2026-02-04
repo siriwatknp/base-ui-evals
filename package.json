@@ -3,8 +3,11 @@
   "version": "0.0.1",
   "private": true,
   "type": "module",
+  "scripts": {
+    "generate-with-skill": "./scripts/duplicate-evals-with-skill.sh"
+  },
   "devDependencies": {
-    "agent-eval": "^0.0.1",
+    "@vercel/agent-eval": "^0.0.8",
     "@types/node": "^22.0.0",
     "typescript": "^5.6.0",
     "vitest": "^2.1.0"
