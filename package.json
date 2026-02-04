@@ -4,7 +4,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "generate-with-skill": "./scripts/duplicate-evals-with-skill.sh"
+    "generate-with-skill": "./scripts/duplicate-evals-with-skill.sh",
+    "cc": "npm run generate-with-skill && npx @vercel/agent-eval cc"
   },
   "devDependencies": {
     "@vercel/agent-eval": "^0.0.8",

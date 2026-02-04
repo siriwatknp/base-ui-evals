@@ -1,6 +1,6 @@
 # Base UI Evals
 
-Agent evaluation framework for Base UI tasks using [agent-eval](https://www.npmjs.com/package/agent-eval).
+Agent evaluation framework for Base UI tasks using [agent-eval](https://www.npmjs.com/package/@vercel/agent-eval).
 
 ## Setup
 
@@ -17,10 +17,10 @@ VERCEL_TOKEN=<your-vercel-token>
 
 ### Tokens
 
-| Token | Where to get it |
-| --- | --- |
-| `AI_GATEWAY_API_KEY` | [Vercel AI Gateway](https://vercel.com/dashboard) > AI Gateway |
-| `VERCEL_TOKEN` | [Vercel Account Tokens](https://vercel.com/account/tokens) — create a personal access token |
+| Token                | Where to get it                                                                             |
+| -------------------- | ------------------------------------------------------------------------------------------- |
+| `AI_GATEWAY_API_KEY` | [Vercel AI Gateway](https://vercel.com/dashboard) > AI Gateway                              |
+| `VERCEL_TOKEN`       | [Vercel Account Tokens](https://vercel.com/account/tokens) — create a personal access token |
 
 > In CI, use `VERCEL_OIDC_TOKEN` instead of `VERCEL_TOKEN` (automatically provided by Vercel's CI integration).
 
@@ -34,65 +34,53 @@ evals/
     package.json     # Eval-specific dependencies & scripts
     tsconfig.json    # TypeScript config
     src/             # Source code the agent will modify
+skills/
+  using-base-ui/     # Skills copied into -with-skill eval variants
 experiments/
   cc.ts              # Claude Code experiment config
   codex.ts           # Codex experiment config
+scripts/
+  duplicate-evals-with-skill.sh  # Generates -with-skill eval copies
 ```
+
+## Commands
+
+| Command                           | Description                                                                                               |
+| --------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| `npm run generate-with-skill`     | Duplicate each eval into `<eval-name>-with-skill` with skills from `skills/` injected as `.claude/skills` |
+| `npm run cc`                      | Generate `-with-skill` variants then run all evals via Claude Code                                        |
+| `npx @vercel/agent-eval cc --dry` | Dry run (no API calls, no cost)                                                                           |
 
 ## Creating a new eval
 
 Each eval lives in `evals/<eval-name>/` and contains:
 
-1. **`PROMPT.md`** — the task description the agent receives
-2. **`EVAL.ts`** — vitest tests that verify the agent completed the task correctly
-3. **`package.json`** — dependencies and a `build` script
+1. **`PROMPT.md`** — short task description (can be a single line)
+2. **`EVAL.ts`** — vitest tests that read source files and assert expected changes; always include a build test
+3. **`package.json`** — dependencies and a `"build"` script (usually `"tsc"`)
 4. **`tsconfig.json`** — TypeScript config
-5. **`src/`** — starter source code the agent will modify
+5. **`src/`** — starter source code with TODO comments hinting at the task
 
-### Use an AI coding agent to scaffold
+> **Naming rule:** eval names must NOT end with `-with-skill` — those are auto-generated.
 
-Copy and paste the following prompt to your AI coding agent:
+After creating or modifying an eval, run:
 
----
-
-```
-Create a new eval in `evals/<EVAL_NAME>/` by following the existing pattern in `evals/add-greeting/`.
-
-The eval should test: <DESCRIBE WHAT THE EVAL SHOULD TEST>
-
-Create these files:
-
-1. `evals/<EVAL_NAME>/PROMPT.md` — Write a clear task description with specific requirements. This is what the agent under test will receive as instructions.
-
-2. `evals/<EVAL_NAME>/EVAL.ts` — Write vitest tests that validate the agent completed the task. Tests should:
-   - Read source files and assert expected changes exist
-   - Run `npm run build` to verify the code still compiles
-   - Be deterministic (no flaky checks)
-
-3. `evals/<EVAL_NAME>/package.json` — Include:
-   - A `"build"` script (usually `"tsc"`)
-   - Required dependencies for the source code (e.g. react, @base-ui-components/react)
-   - vitest and typescript as devDependencies
-
-4. `evals/<EVAL_NAME>/tsconfig.json` — Use this template:
-   {
-     "compilerOptions": {
-       "target": "ES2020",
-       "module": "ESNext",
-       "moduleResolution": "bundler",
-       "jsx": "react-jsx",
-       "strict": true,
-       "outDir": "dist",
-       "skipLibCheck": true
-     },
-     "include": ["src"]
-   }
-
-5. `evals/<EVAL_NAME>/src/` — Create starter source files that the agent will need to modify to complete the task.
-
-Reference `evals/add-greeting/` for the exact patterns used.
+```bash
+npm run generate-with-skill
 ```
 
----
+This duplicates each eval into `evals/<eval-name>-with-skill/` and copies `skills/` into `.claude/skills` inside the copy, so evals can be compared with and without skills.
 
-Replace `<EVAL_NAME>` with the eval name (kebab-case) and `<DESCRIBE WHAT THE EVAL SHOULD TEST>` with your task description.
+## Running evals
+
+```bash
+npm run cc
+```
+
+This generates `-with-skill` variants first, then runs all evals via Claude Code.
+
+To preview which evals will run without making API calls:
+
+```bash
+npx @vercel/agent-eval cc --dry
+```

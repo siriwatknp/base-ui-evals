@@ -1,1 +1,1 @@
-Render a Base UI button in App.tsx
+Install Base UI and render the button in App.tsx
